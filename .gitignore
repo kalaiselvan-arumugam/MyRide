@@ -1,0 +1,54 @@
+# ==============================================================================
+# Git Ignore - Clean Build Only
+# Ignores all non-build files, personal notes, documentation, outputs, and IDE configs
+# ==============================================================================
+
+# Build & compiler output
+.gradle/
+.kotlin/
+build/
+app/build/
+*.apk
+*.aab
+local.properties
+/captures
+.externalNativeBuild
+.cxx
+
+# IDE & editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Signing keys, certificates & credentials
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+
+# Documentation and project handover notes (not required for build)
+cleanup.md
+*.md
+!README.md
+
+# Logs, trace dumps, and scratch files
+*.log
+*.tmp
+*.bak
+*~
+research/
+tools/
+scratch/
+
+# Personal telemetry exports and ride captures
+Ride_*.csv
+Ride_*.gpx
+Ride_*.tsv
+*_report.html
