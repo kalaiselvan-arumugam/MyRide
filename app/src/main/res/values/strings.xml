@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MyRide</string>
+    <string name="shortcut_connect_short">Connect Bike</string>
+    <string name="shortcut_connect_long">Connect to your bike</string>
+</resources>

@@ -1,0 +1,16 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="connect_bike"
+        android:enabled="true"
+        android:icon="@drawable/ic_qs_bike"
+        android:shortcutShortLabel="@string/shortcut_connect_short"
+        android:shortcutLongLabel="@string/shortcut_connect_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.kalaiselvan.ride"
+            android:targetClass="com.kalaiselvan.ride.MainActivity">
+            <extra android:name="ACTION_CONNECT" android:value="true" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="logs" path="logs/" />
+    <cache-path name="export" path="export/" />
+    <files-path name="sessions" path="sessions/" />
+    <files-path name="receipts" path="receipts/" />
+</paths>
