@@ -29,10 +29,20 @@ object LogStore {
     private val _dtcCodes = MutableStateFlow<List<String>>(emptyList())
     val dtcCodes: StateFlow<List<String>> = _dtcCodes.asStateFlow()
 
+    private val MAC_REGEX = Regex("([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})")
+    private val API_KEY_REGEX = Regex("(?i)(api[_-]?key|token|auth)=([a-zA-Z0-9_\\-]+)")
+
+    private fun sanitize(input: String): String {
+        return input
+            .replace(MAC_REGEX, "[REDACTED_MAC]")
+            .replace(API_KEY_REGEX, "$1=[REDACTED]")
+    }
+
     @Synchronized
     fun logEvent(message: String) {
         val time = timeFormat.format(Date())
-        val entry = "[$time] $message"
+        val sanitized = sanitize(message)
+        val entry = "[$time] $sanitized"
         android.util.Log.d("MyRide", entry)
         val current = _systemLogs.value.toMutableList()
         current.add(0, entry)

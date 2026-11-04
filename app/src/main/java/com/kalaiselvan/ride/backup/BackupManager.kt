@@ -103,7 +103,8 @@ object BackupManager {
     private const val GCM_TAG_LENGTH = 128
     private const val VERIFIER_LENGTH = 16
     private val VERIFIER_PAYLOAD = "MYRIDE_AUTH_TOKEN_V2".toByteArray(Charsets.UTF_8)
-    private const val PBKDF2_ITERATIONS = 5_000
+    private const val PBKDF2_ITERATIONS = 100_000
+    private const val PBKDF2_LEGACY_V2_ITERATIONS = 5_000
     private const val PBKDF2_LEGACY_ITERATIONS = 100_000
     private const val KEY_LENGTH_BITS = 256
 
@@ -317,11 +318,17 @@ object BackupManager {
                     val expectedToken = ByteArray(VERIFIER_LENGTH)
                     bufferedIn.read(expectedToken)
 
-                    // Fast derivation (20k iterations: ~150ms)
-                    val key = deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS)
-                    val computedToken = computeVerifierToken(key)
+                    var key = deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS)
+                    var computedToken = computeVerifierToken(key)
                     if (!computedToken.contentEquals(expectedToken)) {
-                        return BackupInspectionResult.InvalidPassword
+                        // Check legacy 5k iteration v2 format
+                        val legacyKey = deriveKey(password.toCharArray(), salt, PBKDF2_LEGACY_V2_ITERATIONS)
+                        val legacyToken = computeVerifierToken(legacyKey)
+                        if (legacyToken.contentEquals(expectedToken)) {
+                            key = legacyKey
+                        } else {
+                            return BackupInspectionResult.InvalidPassword
+                        }
                     }
                     secretKey = key
                 } else {
@@ -424,10 +431,17 @@ object BackupManager {
                     val expectedToken = ByteArray(VERIFIER_LENGTH)
                     bufferedIn.read(expectedToken)
 
-                    val key = deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS)
-                    val computedToken = computeVerifierToken(key)
+                    var key = deriveKey(password.toCharArray(), salt, PBKDF2_ITERATIONS)
+                    var computedToken = computeVerifierToken(key)
                     if (!computedToken.contentEquals(expectedToken)) {
-                        return RestoreResult.InvalidPassword
+                        // Check legacy 5k iteration v2 format
+                        val legacyKey = deriveKey(password.toCharArray(), salt, PBKDF2_LEGACY_V2_ITERATIONS)
+                        val legacyToken = computeVerifierToken(legacyKey)
+                        if (legacyToken.contentEquals(expectedToken)) {
+                            key = legacyKey
+                        } else {
+                            return RestoreResult.InvalidPassword
+                        }
                     }
                     secretKey = key
                 } else {
