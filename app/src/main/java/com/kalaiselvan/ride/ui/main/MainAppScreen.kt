@@ -156,8 +156,15 @@ fun MainAppScreen(
     }
     LaunchedEffect(activity?.intent) {
         val intent = activity?.intent
-        val shouldConnect = intent?.getBooleanExtra("ACTION_CONNECT", false) == true ||
+        val action = intent?.action
+        // Validate intent action is a recognized launcher or shortcut entry point
+        val isValidAction = action == null ||
+                action == Intent.ACTION_MAIN ||
+                action == Intent.ACTION_VIEW
+        val shouldConnect = isValidAction && (
+                intent?.getBooleanExtra("ACTION_CONNECT", false) == true ||
                 intent?.getBooleanExtra("ACTION_REQUEST_BT", false) == true
+        )
         if (shouldConnect) {
             // Consume extras to prevent re-triggering on configuration changes or activity resume
             intent.removeExtra("ACTION_CONNECT")

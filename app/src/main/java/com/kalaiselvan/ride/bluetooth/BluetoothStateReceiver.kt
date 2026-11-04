@@ -40,7 +40,7 @@ class BluetoothStateReceiver : BroadcastReceiver() {
                 // Verify the broadcast comes from our own package to prevent intent spoofing
                 val senderPackage = intent.`package` ?: intent.component?.packageName
                 if (action == BackgroundBleScanner.ACTION_BLE_FOUND && senderPackage != null && senderPackage != context.packageName) {
-                    LogStore.logEvent("BluetoothStateReceiver: Rejected unauthorized external BLE broadcast from ")
+                    LogStore.logEvent("BluetoothStateReceiver: Rejected unauthorized external BLE broadcast from $senderPackage")
                     return
                 }
                 val results = IntentCompat.getParcelableArrayListExtra(intent, BluetoothLeScanner.EXTRA_LIST_SCAN_RESULT, ScanResult::class.java)
