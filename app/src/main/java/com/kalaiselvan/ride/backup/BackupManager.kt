@@ -30,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec
  */
 data class BackupManifest(
     val backupVersion: Int = 1,
-    val appVersion: String = "1.0.0",
+    val appVersion: String = "1.0.1",
     val createdAtMs: Long = System.currentTimeMillis(),
     val serviceRecordCount: Int = 0,
     val receiptFileCount: Int = 0,
