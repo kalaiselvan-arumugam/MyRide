@@ -155,9 +155,20 @@ fun MainAppScreen(
         }
     }
     LaunchedEffect(activity?.intent) {
-        val shouldConnect = activity?.intent?.getBooleanExtra("ACTION_CONNECT", false) == true ||
-                activity?.intent?.getBooleanExtra("ACTION_REQUEST_BT", false) == true
+        val intent = activity?.intent
+        val action = intent?.action
+        // Validate intent action is a recognized launcher or shortcut entry point
+        val isValidAction = action == null ||
+                action == Intent.ACTION_MAIN ||
+                action == Intent.ACTION_VIEW
+        val shouldConnect = isValidAction && (
+                intent?.getBooleanExtra("ACTION_CONNECT", false) == true ||
+                intent?.getBooleanExtra("ACTION_REQUEST_BT", false) == true
+        )
         if (shouldConnect) {
+            // Consume extras to prevent re-triggering on configuration changes or activity resume
+            intent.removeExtra("ACTION_CONNECT")
+            intent.removeExtra("ACTION_REQUEST_BT")
             val bm = context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
             if (bm?.adapter?.isEnabled == true) {
                 telemetryEngine.connect()

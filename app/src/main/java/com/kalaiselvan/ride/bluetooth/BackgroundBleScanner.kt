@@ -79,6 +79,7 @@ object BackgroundBleScanner {
     private fun getPendingIntent(context: Context): PendingIntent {
         val intent = Intent(context, BluetoothStateReceiver::class.java).apply {
             action = ACTION_BLE_FOUND
+            setPackage(context.packageName)
         }
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE

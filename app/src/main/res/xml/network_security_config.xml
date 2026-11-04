@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Block all cleartext HTTP traffic globally -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Enforce HTTPS and trusted certificates for map services -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.olamaps.io</domain>
+        <domain includeSubdomains="true">tile.openstreetmap.org</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
+

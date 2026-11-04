@@ -1632,9 +1632,9 @@ fun SettingsScreen(
                     val vName = try {
                         context.packageManager.getPackageInfo(context.packageName, 0).versionName
                     } catch (_: Exception) {
-                        "1.0.0"
+                        "1.0.1"
                     }
-                    "Version ${vName ?: "1.0.0"}"
+                    "Version ${vName ?: "1.0.1"}"
                 },
                     color = TextMuted.copy(alpha = 0.6f),
                     fontSize = 9.sp,
