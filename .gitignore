@@ -1,0 +1,81 @@
+# ==============================================================================
+# Android Application - Production Git Ignore
+# ==============================================================================
+
+# Android build outputs & compiler caches
+**/build/
+.gradle/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# Local configuration, SDK paths & environment
+local.properties
+.env
+.env.*
+!.env.example
+
+# Private developer suite (unreleased/internal only)
+app/src/internal/
+
+# Signing keys, certificates & credentials
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+keystore.properties
+google-services.json
+
+# IDE and workspace files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Logs, trace dumps, and scratch files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+research/
+tools/
+scratch/
+
+# Personal telemetry exports and ride captures
+Ride_*.csv
+Ride_*.gpx
+Ride_*.tsv
+*_report.html
+
+# Internal documentation, audit notes & rules
+AGENTS.md
+IP_AUDIT_REPORT.md
+THIRD_PARTY_NOTICES.md
+PROVENANCE.md
+TRADEMARKS.md
+ORIGINAL_IMPLEMENTATION.md
+SOFTWARE_BILL_OF_MATERIALS.md
+AndroidSecurityAudit_*.md
+IMU_ACCELERATION_ANALYSIS.md
+cleanup.md
+*.md
+!README.md
+
+# AI coding agent artifacts, instructions & caches
+.agents/
+.agent/
+.claude/
+.cursor/
+.gemini/
+.antigravity/

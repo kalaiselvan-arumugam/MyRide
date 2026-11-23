@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MyRide</string>
+    <string name="shortcut_connect_short">Connect Bike</string>
+    <string name="shortcut_connect_long">Connect to your bike</string>
+
+    <!-- Developer & Project Info -->
+    <string name="app_tagline">Clean Native Telemetry &amp; TFT Mirroring for your bike</string>
+    <string name="developed_by">Developed by</string>
+    <string name="developer_name">Kalaiselvan Arumugam</string>
+    <string name="github_repo_url">https://github.com/kalaiselvan-arumugam/MyRide</string>
+</resources>
