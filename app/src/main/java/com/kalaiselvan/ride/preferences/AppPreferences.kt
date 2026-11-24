@@ -184,7 +184,13 @@ data class UserPreferences(
     val crashSmsSubscriptionId: Int = -1,
     val crashEmergencyContacts: String = "[]",
     val crashNotifiedContacts: String = "[]",
-    val simPhoneOverrides: String = "{}"
+    val simPhoneOverrides: String = "{}",
+    // Audio Cockpit & Helmet Alerts
+    val audioAlertsEnabled: Boolean = false,
+    val audioRevLimitAlert: Boolean = true,
+    val audioSpeedThresholdAlert: Boolean = true,
+    val audioLeanAngleAlert: Boolean = true,
+    val audioLeanThresholdDeg: Int = 40
 )
 
 class AppPreferences private constructor(context: Context) {
@@ -282,6 +288,11 @@ class AppPreferences private constructor(context: Context) {
         private const val KEY_CRASH_CONTACTS = "crash_emergency_contacts"
         private const val KEY_CRASH_NOTIFIED = "crash_notified_contacts"
         private const val KEY_SIM_OVERRIDES = "sim_phone_overrides"
+        private const val KEY_AUDIO_ALERTS_ENABLED = "audio_alerts_enabled"
+        private const val KEY_AUDIO_REV_LIMIT = "audio_rev_limit_alert"
+        private const val KEY_AUDIO_SPEED_THRESHOLD = "audio_speed_threshold_alert"
+        private const val KEY_AUDIO_LEAN_ANGLE = "audio_lean_angle_alert"
+        private const val KEY_AUDIO_LEAN_DEG = "audio_lean_threshold_deg"
 
         fun getDefaultCurrencySymbol(): String {
             return try {
@@ -431,7 +442,12 @@ class AppPreferences private constructor(context: Context) {
             crashSmsSubscriptionId = prefs.getInt(KEY_CRASH_SIM_ID, -1),
             crashEmergencyContacts = prefs.getString(KEY_CRASH_CONTACTS, "[]") ?: "[]",
             crashNotifiedContacts = prefs.getString(KEY_CRASH_NOTIFIED, "[]") ?: "[]",
-            simPhoneOverrides = prefs.getString(KEY_SIM_OVERRIDES, "{}") ?: "{}"
+            simPhoneOverrides = prefs.getString(KEY_SIM_OVERRIDES, "{}") ?: "{}",
+            audioAlertsEnabled = prefs.getBoolean(KEY_AUDIO_ALERTS_ENABLED, false),
+            audioRevLimitAlert = prefs.getBoolean(KEY_AUDIO_REV_LIMIT, true),
+            audioSpeedThresholdAlert = prefs.getBoolean(KEY_AUDIO_SPEED_THRESHOLD, true),
+            audioLeanAngleAlert = prefs.getBoolean(KEY_AUDIO_LEAN_ANGLE, true),
+            audioLeanThresholdDeg = prefs.getInt(KEY_AUDIO_LEAN_DEG, 40)
         )
     }
 
@@ -1065,6 +1081,31 @@ class AppPreferences private constructor(context: Context) {
         }.toString()
         prefs.edit().putString(KEY_CRASH_CONTACTS, json).apply()
         _userPreferences.value = _userPreferences.value.copy(crashEmergencyContacts = json)
+    }
+
+    fun setAudioAlertsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUDIO_ALERTS_ENABLED, enabled).apply()
+        _userPreferences.value = _userPreferences.value.copy(audioAlertsEnabled = enabled)
+    }
+
+    fun setAudioRevLimitAlert(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUDIO_REV_LIMIT, enabled).apply()
+        _userPreferences.value = _userPreferences.value.copy(audioRevLimitAlert = enabled)
+    }
+
+    fun setAudioSpeedThresholdAlert(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUDIO_SPEED_THRESHOLD, enabled).apply()
+        _userPreferences.value = _userPreferences.value.copy(audioSpeedThresholdAlert = enabled)
+    }
+
+    fun setAudioLeanAngleAlert(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUDIO_LEAN_ANGLE, enabled).apply()
+        _userPreferences.value = _userPreferences.value.copy(audioLeanAngleAlert = enabled)
+    }
+
+    fun setAudioLeanThresholdDeg(deg: Int) {
+        prefs.edit().putInt(KEY_AUDIO_LEAN_DEG, deg).apply()
+        _userPreferences.value = _userPreferences.value.copy(audioLeanThresholdDeg = deg)
     }
 
     fun getCrashEmergencyContacts(): List<EmergencyContact> {

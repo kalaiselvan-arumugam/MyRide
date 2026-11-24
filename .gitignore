@@ -79,3 +79,8 @@ cleanup.md
 .cursor/
 .gemini/
 .antigravity/
+
+# Temporary audio preview and release artifacts
+release/
+audio_preview/
+generate_audio.py

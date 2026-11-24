@@ -656,13 +656,35 @@ private fun RideLogCard(
                     }
                 }
 
-                // Delete Ride Action
+                // Action Row: Share as GPX & Delete Ride
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 4.dp),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color(0x1500E676))
+                            .clickable {
+                                com.kalaiselvan.ride.logs.ExportManager.exportRideAsGpx(context, session)
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "SHARE GPX",
+                            color = Color(0xFF00E676),
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        )
+                    }
+
                     Text(
                         text = "DELETE THIS RIDE",
                         color = Color(0xFFFF5252).copy(alpha = 0.85f),

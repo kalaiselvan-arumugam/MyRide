@@ -2331,6 +2331,204 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // ── 4B. Cockpit & Helmet Audio Alerts ───────────────────────
+        var isAudioAlertsCardExpanded by remember { mutableStateOf(false) }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .neumorphicOuter(cornerRadius = 14.dp, blurRadius = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isAudioAlertsCardExpanded = !isAudioAlertsCardExpanded }
+                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text(
+                        text = "COCKPIT AUDIO ALERTS",
+                        color = TextMuted,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 2.sp
+                    )
+                    Text(
+                        text = if (isAudioAlertsCardExpanded) "Helmet & TWS synthesized sound cues" else (if (userPrefs.audioAlertsEnabled) "Enabled (Rev, Speed & Lean)" else "Disabled"),
+                        color = if (userPrefs.audioAlertsEnabled) (if (theme.isLight) Color(0xFF00C853) else AccentGreen) else TextMuted,
+                        fontSize = 12.sp
+                    )
+                }
+                FlatIcon(
+                    type = if (isAudioAlertsCardExpanded) FlatIconType.CHEVRON_UP else FlatIconType.CHEVRON_DOWN,
+                    tint = TextMuted,
+                    size = 20.dp
+                )
+            }
+
+            AnimatedVisibility(
+                visible = isAudioAlertsCardExpanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Divider()
+
+                    // Master Audio Alerts Toggle
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                            Text("Enable Audio Alerts", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                            Text(
+                                text = "Plays synthesized pulse tones in helmet/earbuds when thresholds are reached",
+                                color = TextMuted,
+                                fontSize = 12.sp
+                            )
+                        }
+                        NeumorphicSwitch(
+                            checked = userPrefs.audioAlertsEnabled,
+                            onCheckedChange = { appPrefs.setAudioAlertsEnabled(it) }
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = userPrefs.audioAlertsEnabled,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            Divider()
+
+                            // 1. Rev Limit Alert
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                                    Text("Rev Limit Alert", color = TextMain, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
+                                    Text(
+                                        text = "Triple chirp when reaching shift lamp / redline RPM",
+                                        color = TextMuted,
+                                        fontSize = 11.5.sp
+                                    )
+                                }
+                                NeumorphicSwitch(
+                                    checked = userPrefs.audioRevLimitAlert,
+                                    onCheckedChange = { appPrefs.setAudioRevLimitAlert(it) }
+                                )
+                            }
+
+                            // 2. Speed Threshold Alerts
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                                    Text("Speed Threshold Pulses", color = TextMain, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
+                                    Text(
+                                        text = "2 pulses at 80 km/h, 3 pulses at 150 km/h, 4 pulses at 200 km/h",
+                                        color = TextMuted,
+                                        fontSize = 11.5.sp
+                                    )
+                                }
+                                NeumorphicSwitch(
+                                    checked = userPrefs.audioSpeedThresholdAlert,
+                                    onCheckedChange = { appPrefs.setAudioSpeedThresholdAlert(it) }
+                                )
+                            }
+
+                            // 3. Lean Angle Alert
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                                    Text("Lean Angle Alert", color = TextMain, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
+                                    Text(
+                                        text = "Directional blip in corresponding ear (L/R) when apex lean is achieved",
+                                        color = TextMuted,
+                                        fontSize = 11.5.sp
+                                    )
+                                }
+                                NeumorphicSwitch(
+                                    checked = userPrefs.audioLeanAngleAlert,
+                                    onCheckedChange = { appPrefs.setAudioLeanAngleAlert(it) }
+                                )
+                            }
+
+                            if (userPrefs.audioLeanAngleAlert) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("Lean Angle Trigger", color = TextMuted, fontSize = 12.sp)
+                                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        listOf(30, 35, 40, 45).forEach { deg ->
+                                            val isSelected = userPrefs.audioLeanThresholdDeg == deg
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .background(if (isSelected) (if (theme.isLight) Color(0xFF00C853) else AccentGreen) else ChipBg)
+                                                    .clickable { appPrefs.setAudioLeanThresholdDeg(deg) }
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = "$deg°",
+                                                    color = if (isSelected) (if (theme.isLight) Color.White else Color.Black) else TextMuted,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Test Audio Button
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0x1000E676))
+                                    .clickable {
+                                        com.kalaiselvan.ride.audio.AudioAlertManager.playRevLimitAlert()
+                                    }
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "TEST COCKPIT AUDIO TONE",
+                                    color = Color(0xFF00E676),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         // ── 5. Developer / About Card ────────────────────────────────
         Column(
             modifier = Modifier

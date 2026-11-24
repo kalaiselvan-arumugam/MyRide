@@ -976,6 +976,90 @@ class TelemetryEngine private constructor(
             bikeVin = newVin,
             shiftLampRpm = p.shiftLampRpm ?: if (current.shiftLampRpm > 0) current.shiftLampRpm else appPrefs.userPreferences.value.shiftLampRpm
         )
+
+        evaluateAudioAlerts(
+            speedKmh = newTargetSpeed,
+            rpm = newTargetRpm,
+            shiftLampRpm = _state.value.shiftLampRpm,
+            leanAngle = newCurrentLean,
+            isLeftLean = newLeanDir.equals("LEFT", ignoreCase = true)
+        )
+    }
+
+    // ── Audio Alert Evaluation & Hysteresis State Machine ───────────
+    private var lastRevAlertTime = 0L
+    private var lastSpeedAlert80Fired = false
+    private var lastSpeedAlert150Fired = false
+    private var lastSpeedAlert200Fired = false
+    private var lastLeanAlertTime = 0L
+    private var isLeanAlertArmed = true
+
+    private fun evaluateAudioAlerts(
+        speedKmh: Float,
+        rpm: Float,
+        shiftLampRpm: Int,
+        leanAngle: Float,
+        isLeftLean: Boolean
+    ) {
+        val prefs = appPrefs.userPreferences.value
+        if (!prefs.audioAlertsEnabled) return
+
+        val now = System.currentTimeMillis()
+
+        // 1. Rev Limit / Shift Lamp Alert (with 3.5s cooldown)
+        if (prefs.audioRevLimitAlert) {
+            val limitRpm = if (shiftLampRpm > 0) shiftLampRpm else 11000 // Z900 redline default
+            if (rpm >= limitRpm && (now - lastRevAlertTime > 3500L)) {
+                lastRevAlertTime = now
+                com.kalaiselvan.ride.audio.AudioAlertManager.playRevLimitAlert()
+            }
+        }
+
+        // 2. Speed Threshold Alerts (80, 150, 200 km/h or equivalent MPH)
+        if (prefs.audioSpeedThresholdAlert) {
+            // Speed crossing 80 km/h (reset hysteresis at 72 km/h)
+            if (speedKmh >= 80f) {
+                if (!lastSpeedAlert80Fired) {
+                    lastSpeedAlert80Fired = true
+                    com.kalaiselvan.ride.audio.AudioAlertManager.playSpeed80Alert()
+                }
+            } else if (speedKmh < 72f) {
+                lastSpeedAlert80Fired = false
+            }
+
+            // Speed crossing 150 km/h (reset hysteresis at 140 km/h)
+            if (speedKmh >= 150f) {
+                if (!lastSpeedAlert150Fired) {
+                    lastSpeedAlert150Fired = true
+                    com.kalaiselvan.ride.audio.AudioAlertManager.playSpeed150Alert()
+                }
+            } else if (speedKmh < 140f) {
+                lastSpeedAlert150Fired = false
+            }
+
+            // Speed crossing 200 km/h (reset hysteresis at 188 km/h)
+            if (speedKmh >= 200f) {
+                if (!lastSpeedAlert200Fired) {
+                    lastSpeedAlert200Fired = true
+                    com.kalaiselvan.ride.audio.AudioAlertManager.playSpeed200Alert()
+                }
+            } else if (speedKmh < 188f) {
+                lastSpeedAlert200Fired = false
+            }
+        }
+
+        // 3. Lean Angle Alert (with direction-aware ear panning and 8° reset hysteresis)
+        if (prefs.audioLeanAngleAlert) {
+            val threshold = prefs.audioLeanThresholdDeg.toFloat()
+            if (leanAngle >= threshold && isLeanAlertArmed && (now - lastLeanAlertTime > 2000L)) {
+                lastLeanAlertTime = now
+                isLeanAlertArmed = false
+                com.kalaiselvan.ride.audio.AudioAlertManager.playLeanAlert(isLeft = isLeftLean)
+            } else if (leanAngle < (threshold - 8f)) {
+                // Once bike straightens up by at least 8 degrees, re-arm for next apex
+                isLeanAlertArmed = true
+            }
+        }
     }
 
     /**
