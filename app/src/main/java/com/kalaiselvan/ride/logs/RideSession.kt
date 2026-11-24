@@ -36,6 +36,7 @@ data class RideBreadcrumb(
 
 data class RideSession(
     val id: String = System.currentTimeMillis().toString(),
+    val title: String = "",
     val startTime: Long,
     val endTime: Long = System.currentTimeMillis(),
     val durationSeconds: Long,
@@ -50,6 +51,9 @@ data class RideSession(
     val avgFuelMileage: Float = 17.5f,
     val breadcrumbs: List<RideBreadcrumb> = emptyList()
 ) {
+    val displayTitle: String
+        get() = if (title.isNotBlank()) title else formattedDate
+
     val formattedDate: String
         get() = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(Date(startTime))
 
@@ -63,6 +67,7 @@ data class RideSession(
 
     fun toJsonObject(): JSONObject = JSONObject().apply {
         put("id", id)
+        put("title", title)
         put("startTime", startTime)
         put("endTime", endTime)
         put("durationSeconds", durationSeconds)
@@ -92,6 +97,7 @@ data class RideSession(
             }
             return RideSession(
                 id = json.optString("id", System.currentTimeMillis().toString()),
+                title = json.optString("title", "").take(15),
                 startTime = json.optLong("startTime", System.currentTimeMillis()),
                 endTime = json.optLong("endTime", System.currentTimeMillis()),
                 durationSeconds = json.optLong("durationSeconds", 0L),

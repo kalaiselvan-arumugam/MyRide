@@ -52,7 +52,7 @@ object ExportManager {
     fun exportRideSession(context: Context, session: RideSession) {
         try {
             val text = """
-                === MyRide Session Summary ===
+                === MyRide Session: ${session.displayTitle} ===
                 Date: ${session.formattedDate}
                 Duration: ${session.formattedDuration}
                 Distance: ${String.format("%.1f", session.distanceKm)} km
@@ -77,7 +77,7 @@ object ExportManager {
 
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(Intent.EXTRA_SUBJECT, "MyRide Session: ${session.formattedDate}")
+                putExtra(Intent.EXTRA_SUBJECT, "MyRide Session: ${session.displayTitle}")
                 putExtra(Intent.EXTRA_STREAM, uri)
                 putExtra(Intent.EXTRA_TEXT, text)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -118,11 +118,11 @@ object ExportManager {
             sb.append("     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n")
             sb.append("     xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n")
             sb.append("  <metadata>\n")
-            sb.append("    <name>MyRide - ${session.formattedDate}</name>\n")
+            sb.append("    <name>${session.displayTitle}</name>\n")
             sb.append("    <time>$startTimeIso</time>\n")
             sb.append("  </metadata>\n")
             sb.append("  <trk>\n")
-            sb.append("    <name>Ride ${session.formattedDate}</name>\n")
+            sb.append("    <name>${session.displayTitle}</name>\n")
             sb.append("    <desc>Distance: ${String.format(Locale.US, "%.1f", session.distanceKm)} km, Top Speed: ${session.topSpeedKmh.toInt()} km/h, Max Lean: L ${session.maxLeanLeft.toInt()}° / R ${session.maxLeanRight.toInt()}°</desc>\n")
             sb.append("    <trkseg>\n")
 

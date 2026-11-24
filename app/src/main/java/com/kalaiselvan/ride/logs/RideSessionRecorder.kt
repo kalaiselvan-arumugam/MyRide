@@ -199,6 +199,15 @@ object RideSessionRecorder {
         persistSessions()
     }
 
+    fun renameSession(sessionId: String, newTitle: String) {
+        val safeTitle = newTitle.trim().take(15)
+        val updated = _completedSessions.value.map {
+            if (it.id == sessionId) it.copy(title = safeTitle) else it
+        }
+        _completedSessions.value = updated
+        persistSessions()
+    }
+
     fun clearCompletedSessions() {
         _completedSessions.value = emptyList()
         val ctx = appContext

@@ -124,6 +124,8 @@ private fun RideHistoryContent() {
     var expandedSessionId by remember { mutableStateOf<String?>(null) }
     var fullscreenSession by remember { mutableStateOf<RideSession?>(null) }
     var sessionToDelete by remember { mutableStateOf<RideSession?>(null) }
+    var sessionToRename by remember { mutableStateOf<RideSession?>(null) }
+    var renameInput by remember { mutableStateOf("") }
 
     // Filter sessions by selected date or default to last 10 (with show all option)
     val displayedSessions = remember(completedSessions, selectedDateKey, showAllSessions) {
@@ -251,6 +253,10 @@ private fun RideHistoryContent() {
                     },
                     onDelete = {
                         sessionToDelete = session
+                    },
+                    onRename = {
+                        renameInput = session.title
+                        sessionToRename = session
                     }
                 )
             }
@@ -340,6 +346,76 @@ private fun RideHistoryContent() {
             containerColor = BgCard
         )
     }
+
+    // Rename Ride Dialog (Max 15 characters limit)
+    sessionToRename?.let { session ->
+        AlertDialog(
+            onDismissRequest = { sessionToRename = null },
+            title = {
+                Text(
+                    text = "Name This Ride",
+                    color = TextMain,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Set a custom title (e.g. Hill Run, Track Day). Max 15 characters.",
+                        color = TextMuted,
+                        fontSize = 12.5.sp
+                    )
+                    OutlinedTextField(
+                        value = renameInput,
+                        onValueChange = {
+                            if (it.length <= 15) renameInput = it
+                        },
+                        singleLine = true,
+                        placeholder = { Text("e.g. Track Day", color = TextMuted.copy(alpha = 0.5f)) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = AccentGreen,
+                            unfocusedBorderColor = ChipBorder,
+                            focusedTextColor = TextMain,
+                            unfocusedTextColor = TextMain
+                        ),
+                        trailingIcon = {
+                            Text(
+                                text = "${renameInput.length}/15",
+                                color = TextMuted,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        RideSessionRecorder.renameSession(session.id, renameInput)
+                        sessionToRename = null
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentGreen)
+                ) {
+                    Text("Save", color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { sessionToRename = null },
+                    shape = RoundedCornerShape(10.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, ChipBorder),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextMuted)
+                ) {
+                    Text("Cancel", color = TextMuted)
+                }
+            },
+            containerColor = BgCard
+        )
+    }
 }
 
 @Composable
@@ -349,7 +425,8 @@ private fun RideLogCard(
     speedUnit: SpeedUnit,
     onToggleExpand: () -> Unit,
     onOpenFullscreen: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onRename: () -> Unit
 ) {
     var colorMode by remember { mutableStateOf(RideMapColorMode.SPEED) }
 
@@ -379,18 +456,37 @@ private fun RideLogCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // Top line: Date and Duration (Duration shown only when collapsed; expanded card shows full breakdown below)
+                // Top line: Custom Title or Date + Rename Button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = session.formattedDate,
-                        color = TextMain,
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = session.displayTitle,
+                            color = TextMain,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(Color(0x15FFFFFF))
+                                .clickable { onRename() }
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "EDIT",
+                                color = TextMuted,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                     if (!isExpanded) {
                         Text(
                             text = session.formattedDuration,
