@@ -47,6 +47,7 @@ Connecting directly over Bluetooth Low Energy (BLE), MyRide communicates with on
 3. [The Cockpit: Dashboard (DASH)](#3-the-cockpit-dashboard-dash)
    - [Tachometer & Gear Indicator](#tachometer--gear-indicator)
    - [Cornering Dynamics & IMU Lean Angle](#cornering-dynamics--imu-lean-angle)
+   - [Cockpit Audio Alerts (Zero-Asset Helmet Sound Cues)](#cockpit-audio-alerts-zero-asset-helmet-sound-cues)
    - [Engine Health & Trip Statistics](#engine-health--trip-statistics)
 4. [Turn-by-Turn Navigation](#4-turn-by-turn-navigation)
    - [Option A: Built-in Interactive Map (Ola Maps)](#option-a-built-in-interactive-map-ola-maps)
@@ -216,6 +217,26 @@ The **DASH** screen is a dedicated zero-scroll vehicle dynamics cockpit engineer
 * **Peak Lean Memory**: Markers track the maximum left and right roll angles reached during your current ride session.
 * **Throttle Position (TPS)**: Bar indicator showing exact throttle valve opening from 0% (closed) to 100% (wide open).
 * **Linear G-Force**: Measures longitudinal acceleration force (`+G`) under throttle and braking deceleration (`-G`).
+
+### Cockpit Audio Alerts (Zero-Asset Helmet Sound Cues)
+MyRide features an ultra-low-latency, zero-asset audio synthesizer engine (`AudioAlertManager`) designed for helmet Bluetooth intercoms (Sena, Cardo, FreedConn) and TWS earbuds. Instead of playing heavy MP3/WAV audio files that introduce playback lag and APK bloat, MyRide synthesizes mathematical 16-bit PCM sine waves directly in code via Android `AudioTrack`:
+
+* **Rev Limit / Shift Lamp Alert**:
+  * **When it plays**: Triggers instantly when engine RPM crosses the shift lamp threshold (or redline, e.g., 11,000 RPM).
+  * **Tone characteristics**: 3 sharp, ultra-distinct high-frequency beeps at **2,200 Hz** (60ms ON, 35ms OFF).
+  * **Hysteresis & Cooldown**: Protected by a 3.5-second anti-repetition cooldown to prevent alert fatigue during sustained high-RPM riding.
+* **Graduated Speed Threshold Pulses**:
+  * **When they play**: Audible speed cues trigger when accelerating past critical highway milestones (or equivalent MPH):
+    * **80 km/h (50 mph)**: **2-pulse chime** at **880 Hz** (100ms ON, 80ms OFF). Resets when vehicle speed drops below 72 km/h.
+    * **150 km/h (93 mph)**: **3-pulse alert** at **1,175 Hz** (90ms ON, 70ms OFF). Resets when vehicle speed drops below 140 km/h.
+    * **200 km/h (124 mph)**: **4-pulse rapid warning** at **1,480 Hz** (80ms ON, 60ms OFF). Resets when vehicle speed drops below 188 km/h.
+  * **Clean Hysteresis**: Tones only sound once when ascending through each speed band and will not re-trigger until the rider dips below the reset threshold and accelerates back up.
+* **Directional Lean Angle Apex Audio**:
+  * **When it plays**: Triggers when cornering lean angle reaches your custom target threshold (configurable between 30° and 55°; default 42°).
+  * **Tone characteristics**: A gentle acoustic blip at **680 Hz** (85ms duration) with 6ms smooth envelope fade to eliminate speaker pop clicks.
+  * **Binaural 3D Spatial Audio**: Plays strictly in the **Left ear** for left-hand corners and **Right ear** for right-hand corners.
+  * **Cornering Hysteresis**: Features an 8° release hysteresis (must straighten the bike by >= 8° from the threshold before re-arming for the next apex) and a 2.0-second safety cooldown.
+* **Audio Focus & Safety**: Uses `USAGE_ASSISTANCE_NAVIGATION_GUIDANCE` and `CONTENT_TYPE_SONIFICATION` so alerts cleanly duck background music without interrupting helmet intercom conversations. Can be individually configured or toggled entirely in **SETTINGS -> COCKPIT AUDIO ALERTS**.
 
 ### Engine Health & Trip Statistics
 * **Coolant Temperature**: Live engine water temperature with thermal threshold alerts.
