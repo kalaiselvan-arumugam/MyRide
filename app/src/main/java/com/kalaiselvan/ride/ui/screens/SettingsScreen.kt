@@ -2362,8 +2362,8 @@ fun SettingsScreen(
                     )
                     Text(
                         text = if (isAudioAlertsCardExpanded) "Helmet & TWS synthesized sound cues" else (if (userPrefs.audioAlertsEnabled) "Enabled (Rev, Speed & Lean)" else "Disabled"),
-                        color = TextMuted,
-                        fontSize = 12.sp
+                        color = TextMuted.copy(alpha = 0.6f),
+                        fontSize = 10.sp
                     )
                 }
                 FlatIcon(

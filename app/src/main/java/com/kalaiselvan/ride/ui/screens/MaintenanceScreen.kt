@@ -43,6 +43,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import com.kalaiselvan.ride.maintenance.MaintenanceStatus
@@ -1336,7 +1337,6 @@ private fun FullScreenReceiptDialog(
 
                 // Main Content View Area (Interactive Pinch/Double-Tap Zoom & Pan & Swipe between documents)
                 var swipeAccumulator by remember(currentPath) { mutableFloatStateOf(0f) }
-                var lastTapTimeMs by remember(currentPath) { mutableLongStateOf(0L) }
 
                 Box(
                     modifier = Modifier
@@ -1347,20 +1347,19 @@ private fun FullScreenReceiptDialog(
                         .background(if (isPdf) Color.White else (if (theme.isLight) Color(0xFFF5F6F9) else Color(0xFF0A0C10)))
                         .border(1.dp, if (isPdf) Color(0xFFE0E0E0) else (if (theme.isLight) Color(0xFFDCDFE5) else Color(0x22FFFFFF)), RoundedCornerShape(16.dp))
                         .pointerInput(currentPath) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                val now = System.currentTimeMillis()
-                                // Check if this was a quick tap or double-tap
-                                if (pan == androidx.compose.ui.geometry.Offset.Zero && zoom == 1f) {
-                                    if (now - lastTapTimeMs < 300L) {
-                                        // Double tap detected
-                                        scale = if (scale > 1.2f) 1f else 2.5f
-                                        if (scale == 1f) offset = androidx.compose.ui.geometry.Offset.Zero
-                                        lastTapTimeMs = 0L
+                            detectTapGestures(
+                                onDoubleTap = {
+                                    if (scale > 1.2f) {
+                                        scale = 1f
+                                        offset = androidx.compose.ui.geometry.Offset.Zero
                                     } else {
-                                        lastTapTimeMs = now
+                                        scale = 2.5f
                                     }
                                 }
-
+                            )
+                        }
+                        .pointerInput(currentPath) {
+                            detectTransformGestures { _, pan, zoom, _ ->
                                 val newScale = (scale * zoom).coerceIn(1f, 5f)
                                 scale = newScale
                                 if (newScale > 1f) {
@@ -1499,13 +1498,13 @@ private fun FullScreenReceiptDialog(
                     Button(
                         onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (theme.isLight) Color(0xFFE2E6EC) else ChipBg,
-                            contentColor = TextMain
+                            containerColor = if (theme.isLight) Color(0xFF1E222B) else Color(0xFF2C323F),
+                            contentColor = Color.White
                         ),
                         shape = RoundedCornerShape(14.dp),
                         modifier = if (isPdf) Modifier.weight(1f) else Modifier.fillMaxWidth()
                     ) {
-                        Text("Done", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("Done", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
