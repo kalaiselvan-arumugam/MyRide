@@ -1233,6 +1233,13 @@ class AppPreferences private constructor(context: Context) {
             put("crashEmergencyContacts", p.crashEmergencyContacts)
             put("crashNotifiedContacts", p.crashNotifiedContacts)
             put("simPhoneOverrides", p.simPhoneOverrides)
+
+            // Cockpit & Helmet Audio Alerts
+            put("audioAlertsEnabled", p.audioAlertsEnabled)
+            put("audioRevLimitAlert", p.audioRevLimitAlert)
+            put("audioSpeedThresholdAlert", p.audioSpeedThresholdAlert)
+            put("audioLeanAngleAlert", p.audioLeanAngleAlert)
+            put("audioLeanThresholdDeg", p.audioLeanThresholdDeg)
         }
     }
 
@@ -1415,6 +1422,13 @@ class AppPreferences private constructor(context: Context) {
         if (json.has("crashEmergencyContacts")) editor.putString(KEY_CRASH_CONTACTS, json.optString("crashEmergencyContacts", "[]"))
         if (json.has("crashNotifiedContacts")) editor.putString(KEY_CRASH_NOTIFIED, json.optString("crashNotifiedContacts", "[]"))
         if (json.has("simPhoneOverrides")) editor.putString(KEY_SIM_OVERRIDES, json.optString("simPhoneOverrides", "{}"))
+
+        // Cockpit & Helmet Audio Alerts
+        if (json.has("audioAlertsEnabled")) editor.putBoolean(KEY_AUDIO_ALERTS_ENABLED, json.optBoolean("audioAlertsEnabled", false))
+        if (json.has("audioRevLimitAlert")) editor.putBoolean(KEY_AUDIO_REV_LIMIT, json.optBoolean("audioRevLimitAlert", true))
+        if (json.has("audioSpeedThresholdAlert")) editor.putBoolean(KEY_AUDIO_SPEED_THRESHOLD, json.optBoolean("audioSpeedThresholdAlert", true))
+        if (json.has("audioLeanAngleAlert")) editor.putBoolean(KEY_AUDIO_LEAN_ANGLE, json.optBoolean("audioLeanAngleAlert", true))
+        if (json.has("audioLeanThresholdDeg")) editor.putInt(KEY_AUDIO_LEAN_DEG, json.optInt("audioLeanThresholdDeg", 40))
 
         editor.apply()
 
