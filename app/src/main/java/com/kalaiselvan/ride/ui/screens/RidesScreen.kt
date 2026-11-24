@@ -450,6 +450,7 @@ private fun RideLogCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(if (isExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                 .clickable { onToggleExpand() }
                 .padding(14.dp),
             horizontalArrangement = Arrangement.SpaceBetween,

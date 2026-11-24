@@ -1175,6 +1175,8 @@ private fun FullScreenReceiptDialog(
     val currentPath = validPaths[safeIndex]
     val isPdf = currentPath.endsWith(".pdf", ignoreCase = true)
 
+    val theme = LocalThemeColors.current
+
     // For images
     val imageBitmap = remember(currentPath) {
         if (!isPdf) loadReceiptBitmap(currentPath) else null
@@ -1196,7 +1198,7 @@ private fun FullScreenReceiptDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(if (theme.isLight) theme.bgDark else Color.Black)
                 .statusBarsPadding()
                 .navigationBarsPadding(),
             contentAlignment = Alignment.Center
@@ -1264,16 +1266,22 @@ private fun FullScreenReceiptDialog(
                             }
                         }
 
-                        // Close Pill Button
+                        // Close Circular Button
                         Box(
                             modifier = Modifier
+                                .size(36.dp)
                                 .clip(CircleShape)
-                                .background(ChipBg)
-                                .border(1.dp, ChipBorder, CircleShape)
-                                .clickable { onDismiss() }
-                                .padding(8.dp)
+                                .background(if (theme.isLight) Color(0x15000000) else Color(0x33FFFFFF))
+                                .border(1.dp, if (theme.isLight) Color(0x20000000) else Color(0x22FFFFFF), CircleShape)
+                                .clickable { onDismiss() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text("✕", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                text = "✕",
+                                color = TextMain,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -1326,26 +1334,58 @@ private fun FullScreenReceiptDialog(
                     }
                 }
 
-                // Main Content View Area (Interactive Pinch-to-Zoom & Pan)
+                // Main Content View Area (Interactive Pinch/Double-Tap Zoom & Pan & Swipe between documents)
+                var swipeAccumulator by remember(currentPath) { mutableFloatStateOf(0f) }
+                var lastTapTimeMs by remember(currentPath) { mutableLongStateOf(0L) }
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(if (isPdf) Color.White else Color(0xFF0A0C10))
-                        .border(1.dp, if (isPdf) Color(0xFFE0E0E0) else Color(0x22FFFFFF), RoundedCornerShape(16.dp))
+                        .background(if (isPdf) Color.White else (if (theme.isLight) Color(0xFFF5F6F9) else Color(0xFF0A0C10)))
+                        .border(1.dp, if (isPdf) Color(0xFFE0E0E0) else (if (theme.isLight) Color(0xFFDCDFE5) else Color(0x22FFFFFF)), RoundedCornerShape(16.dp))
                         .pointerInput(currentPath) {
                             detectTransformGestures { _, pan, zoom, _ ->
-                                scale = (scale * zoom).coerceIn(1f, 5f)
-                                if (scale > 1f) {
-                                    val maxOffset = 600f * (scale - 1f)
+                                val now = System.currentTimeMillis()
+                                // Check if this was a quick tap or double-tap
+                                if (pan == androidx.compose.ui.geometry.Offset.Zero && zoom == 1f) {
+                                    if (now - lastTapTimeMs < 300L) {
+                                        // Double tap detected
+                                        scale = if (scale > 1.2f) 1f else 2.5f
+                                        if (scale == 1f) offset = androidx.compose.ui.geometry.Offset.Zero
+                                        lastTapTimeMs = 0L
+                                    } else {
+                                        lastTapTimeMs = now
+                                    }
+                                }
+
+                                val newScale = (scale * zoom).coerceIn(1f, 5f)
+                                scale = newScale
+                                if (newScale > 1f) {
+                                    val maxOffset = 600f * (newScale - 1f)
                                     offset = androidx.compose.ui.geometry.Offset(
                                         x = (offset.x + pan.x).coerceIn(-maxOffset, maxOffset),
                                         y = (offset.y + pan.y).coerceIn(-maxOffset, maxOffset)
                                     )
                                 } else {
                                     offset = androidx.compose.ui.geometry.Offset.Zero
+                                    // When not zoomed, accumulate horizontal swipe drag to switch attachments
+                                    if (validPaths.size > 1) {
+                                        swipeAccumulator += pan.x
+                                        if (swipeAccumulator < -100f && safeIndex < validPaths.size - 1) {
+                                            swipeAccumulator = 0f
+                                            currentIndex = safeIndex + 1
+                                            scale = 1f
+                                            offset = androidx.compose.ui.geometry.Offset.Zero
+                                        } else if (swipeAccumulator > 100f && safeIndex > 0) {
+                                            swipeAccumulator = 0f
+                                            currentIndex = safeIndex - 1
+                                            scale = 1f
+                                            offset = androidx.compose.ui.geometry.Offset.Zero
+                                        }
+                                    }
                                 }
                             }
                         },
@@ -1444,22 +1484,28 @@ private fun FullScreenReceiptDialog(
                                     Toast.makeText(context, "Cannot open PDF: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextMain),
-                            border = BorderStroke(1.dp, ChipBorder),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (theme.isLight) Color(0xFFF0F2F5) else Color(0x15FFFFFF),
+                                contentColor = TextMain
+                            ),
+                            border = BorderStroke(1.dp, if (theme.isLight) Color(0xFFD0D4DC) else ChipBorder),
                             shape = RoundedCornerShape(14.dp),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Open in External Viewer", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Open in External Viewer", color = TextMain, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
 
                     Button(
                         onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = ChipBg, contentColor = TextMain),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (theme.isLight) Color(0xFFE2E6EC) else ChipBg,
+                            contentColor = TextMain
+                        ),
                         shape = RoundedCornerShape(14.dp),
                         modifier = if (isPdf) Modifier.weight(1f) else Modifier.fillMaxWidth()
                     ) {
-                        Text("Done", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("Done", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }

@@ -87,6 +87,7 @@ fun RideHistoryCalendar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(if (isExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                 .clickable { isExpanded = !isExpanded }
                 .padding(horizontal = 14.dp, vertical = 11.dp),
             horizontalArrangement = Arrangement.SpaceBetween,

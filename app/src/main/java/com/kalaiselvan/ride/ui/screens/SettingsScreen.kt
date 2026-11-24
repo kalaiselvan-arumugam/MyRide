@@ -412,6 +412,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isPermissionsExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isPermissionsExpanded = !isPermissionsExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -580,6 +581,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isAppConfigExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isAppConfigExpanded = !isAppConfigExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1380,6 +1382,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isDataBackupExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isDataBackupExpanded = !isDataBackupExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1768,6 +1771,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isLegalExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isLegalExpanded = !isLegalExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1859,6 +1863,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isExperimentalExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isExperimentalExpanded = !isExperimentalExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -2341,6 +2346,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isAudioAlertsCardExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isAudioAlertsCardExpanded = !isAudioAlertsCardExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -2356,7 +2362,7 @@ fun SettingsScreen(
                     )
                     Text(
                         text = if (isAudioAlertsCardExpanded) "Helmet & TWS synthesized sound cues" else (if (userPrefs.audioAlertsEnabled) "Enabled (Rev, Speed & Lean)" else "Disabled"),
-                        color = if (userPrefs.audioAlertsEnabled) (if (theme.isLight) Color(0xFF00C853) else AccentGreen) else TextMuted,
+                        color = TextMuted,
                         fontSize = 12.sp
                     )
                 }
@@ -2538,6 +2544,7 @@ fun SettingsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(if (isAboutExpanded) RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp) else RoundedCornerShape(14.dp))
                     .clickable { isAboutExpanded = !isAboutExpanded }
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
