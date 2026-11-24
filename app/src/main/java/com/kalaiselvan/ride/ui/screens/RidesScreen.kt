@@ -456,34 +456,44 @@ private fun RideLogCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                // Top line: Custom Title or Date + Rename Button
+                // Top line: Custom Title or Date + Rename Pen Icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = session.displayTitle,
-                            color = TextMain,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0x15FFFFFF))
-                                .clickable { onRename() }
-                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                    Column(modifier = Modifier.weight(1f, fill = false)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Text(
-                                text = "EDIT",
-                                color = TextMuted,
-                                fontSize = 9.sp,
+                                text = session.displayTitle,
+                                color = TextMain,
+                                fontSize = 13.5.sp,
                                 fontWeight = FontWeight.Bold
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .clickable { onRename() }
+                                    .padding(4.dp)
+                            ) {
+                                com.kalaiselvan.ride.ui.components.FlatIcon(
+                                    type = com.kalaiselvan.ride.ui.components.FlatIconType.EDIT,
+                                    tint = TextMuted.copy(alpha = 0.85f),
+                                    size = 13.dp
+                                )
+                            }
+                        }
+                        // If ride has a custom name, display the date in smaller text underneath
+                        if (session.title.isNotBlank()) {
+                            Text(
+                                text = session.formattedDate,
+                                color = TextMuted,
+                                fontSize = 10.5.sp,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier.padding(top = 1.dp)
                             )
                         }
                     }
@@ -492,7 +502,8 @@ private fun RideLogCard(
                             text = session.formattedDuration,
                             color = TextMuted,
                             fontSize = 12.sp,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = FontFamily.Monospace,
+                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }

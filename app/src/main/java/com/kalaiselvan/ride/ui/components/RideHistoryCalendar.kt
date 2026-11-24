@@ -125,27 +125,33 @@ fun RideHistoryCalendar(
                     letterSpacing = 0.5.sp
                 )
 
-                // "Today" Button
+                // "Today" / "All Days" Toggle Button
+                val isTodaySelected = selectedDateKey == todayKey
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(if (selectedDateKey == todayKey) RpmGreen else Color(0x22FFFFFF))
+                        .background(if (isTodaySelected) RpmGreen else Color(0x22FFFFFF))
                         .clickable {
-                            // Select Today's date and align the calendar month to Today, without closing the calendar
-                            calendarMonth = Calendar.getInstance().apply {
-                                set(Calendar.DAY_OF_MONTH, 1)
-                                set(Calendar.HOUR_OF_DAY, 0)
-                                set(Calendar.MINUTE, 0)
-                                set(Calendar.SECOND, 0)
-                                set(Calendar.MILLISECOND, 0)
+                            if (isTodaySelected) {
+                                // If already showing Today, toggle back to All Days
+                                onDateSelected(null)
+                            } else {
+                                // Select Today's date and align calendar month to Today
+                                calendarMonth = Calendar.getInstance().apply {
+                                    set(Calendar.DAY_OF_MONTH, 1)
+                                    set(Calendar.HOUR_OF_DAY, 0)
+                                    set(Calendar.MINUTE, 0)
+                                    set(Calendar.SECOND, 0)
+                                    set(Calendar.MILLISECOND, 0)
+                                }
+                                onDateSelected(todayKey)
                             }
-                            onDateSelected(todayKey)
                         }
                         .padding(horizontal = 7.dp, vertical = 2.5.dp)
                 ) {
                     Text(
-                        text = "TODAY",
-                        color = if (selectedDateKey == todayKey) Color.Black else TextMain,
+                        text = if (isTodaySelected) "ALL DAYS" else "TODAY",
+                        color = if (isTodaySelected) Color.Black else TextMain,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold
                     )
