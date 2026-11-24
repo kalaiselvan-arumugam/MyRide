@@ -457,25 +457,9 @@ The **ACHIEVE** tab tracks riding records across all sessions:
 ### Smart Crash Detection & Emergency SOS
 MyRide includes an experimental, multi-stage Crash Detection & Emergency Response system designed to detect motorcycle accidents and alert designated emergency contacts with GPS coordinates.
 
-```
-+-------------------------------------------------------------------------------------------------+
-|                               CRASH DETECTION & EMERGENCY PIPELINE                              |
-|                                                                                                 |
-|   [STAGE 1: IMPACT SENSING]          [STAGE 2: SPEED VERIFICATION]    [STAGE 3: SOS COUNTDOWN]  |
-|   • Accelerometer (G-force >= 4G-7G) • Was riding speed > 10 km/h?    • 30-sec visible dialog   |
-|   • Gyroscope (Rotational >= 4-7 rad)• Did speed drop to 0 km/h?      • High-volume alert tone  |
-|   • OR Bike IMU chassis impact frame • Evaluated 3 sec post-impact    • Continuous vibration    |
-|                                                                       • Lock-button cancel      |
-+-------------------------------------------------------------------------------------------------+
-                                               |
-                                               v (If countdown expires without cancellation)
-+-------------------------------------------------------------------------------------------------+
-|                               [STAGE 4: EMERGENCY BROADCAST]                                    |
-|   • Automated SMS dispatched to Emergency Contacts via SMSManager                               |
-|   • Message contains live Google Maps pin: "EMERGENCY: I may have had a motorcycle crash..."    |
-|   • Device siren sounds at maximum volume to attract nearby bystanders                          |
-+-------------------------------------------------------------------------------------------------+
-```
+<p align="center">
+  <img src="docs/images/crash_detection_pipeline.jpg" alt="Smart Crash Detection & Emergency SOS Pipeline" width="100%">
+</p>
 
 ### Sensor Fusion & Impact Verification
 To avoid false alarms caused by dropping a phone or riding over potholes, MyRide uses dual-sensor verification:
